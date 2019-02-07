@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      rect {
+        fill: transparent;
+        shape-rendering: crispEdges;
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: rgba(0, 0, 0, 0.1);
+        shape-rendering: crispEdges;
+      }
+
+      .axisLine {
+        fill: none;
+        shape-rendering: crispEdges;
+        stroke: rgba(0, 0, 0, 0.5);
+        stroke-width: 2px;
+      }
+
+	.http://l5vd5.asuscomm.com:3001/dot {
+	  fill-opacity: .5;
+	}
+
+	.d3-tip {
+	  line-height: 1;
+	  font-weight: bold;
+	  padding: 12px;
+	  background: rgba(0, 0, 0, 0.8);
+	  color: #fff;
+	  border-radius: 2px;
+	}
+
+	/* Creates a small triangle extender for the tooltip */
+	.d3-tip:after {
+	  box-sizing: border-box;
+	  display: inline;
+	  font-size: 10px;
+	  width: 100%;
+	  line-height: 1;
+	  color: rgba(0, 0, 0, 0.8);
+	  content: "\25BC";
+	  position: absolute;
+	  text-align: center;
+	}
+
+	/* Style northward tooltips differently */
+	.d3-tip.n:after {
+	  margin: -1px 0 0 0;
+	  top: 100%;
+	  left: 0;
+	}
+  .axisCircles {
+		fill: none;
+		stroke: #E8E8E8;
+		stroke-width: 1px;
+	}
+  .question {
+		font-size: 14px;
+		text-anchor: start;
+		font-weight: 300;
+		fill: #AAAAAA;
+	}
+	.line {
+		stroke: #AAAAAA;
+	}
+  .axisText {
+    fill: #C4C4C4;
+    font-size: 11px;
+    font-weight: 300;
+    text-anchor: middle;
+    text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+  }
+  .monthArc {
+  			fill: white;
+  			stroke: #AAAAAA;
+  		}
+
+  		.monthText {
+  			fill: #6B6B6B;
+  			font-size: 13px;
+  			font-family: 'Courgette', sans-serif;
+  		}
+    </style>
+    <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+    <script>
+    // set the dimensions and margins of the graph
+      window.onload = function() {
+        var margin = {
+        	top: 70,
+        	right: 20,
+        	bottom: 120,
+        	left: 20
+        };
+        //윈도우 크기에 맞춤
+        var width = window.innerWidth - margin.left - margin.right - 20;
+        var height = window.innerHeight - margin.top - margin.bottom - 20;
+
+        var nth = <%=nth%>
+
+        d3.json("../attention.json", function (data) {
+          var context = data['context']
+          var contextLen = data['contextLen']
+          var contextLenSum = contextLen.slice(0, nth-1);
+          var len = contextLen[nth-1];
+          var sum = contextLenSum.reduce(add, 0);
+          var currentContext = context.slice(sum, sum+len);
+
+          c2q_attn = data.c2q_attn[nth-1];//Current c2q_attn
+          currentQuestion = data.questionSet[nth-1];//Current question
+
+          var max = 0;
+          var min = 1;
+
+          //The start date number and end date number of the months in a year
+          var monthData = [
+            {month: "January", 	startDateID: 0, 	endDateID: 30},
+            {month: "February", startDateID: 31, 	endDateID: 58},
+            {month: "March", 	startDateID: 59, 	endDateID: 89},
+            {month: "April", 	startDateID: 90, 	endDateID: 119},
+            {month: "May", 		startDateID: 120, 	endDateID: 150},
+            {month: "June", 	startDateID: 151, 	endDateID: 180},
+            {month: "July", 	startDateID: 181, 	endDateID: 211},
+            {month: "August", 	startDateID: 212, 	endDateID: 242},
+            {month: "September",},
+            {month: "October",},
+            {month: "November",},
+            {month: "December",}
+          ];
+          console.log(currentQuestion)
+
+          $.each(c2q_attn, function(idx, val) {
+            $.each(val, function(idx2, val2) {
+              if (max < val2)
+                max = val2;
+              if (min > val2)
+                min = val2;
+            });
+          });
+
+          //Set up svg
+          var svg = d3.select('#graph')
+            .append('svg')
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + (margin.left + width/2) + "," + (margin.top + height/2) + ")");
+
+
+          //Creates a function that makes SVG paths in the shape of arcs with the specified inner and outer radius
+      		var arc = d3.svg.arc()
+      			.innerRadius(width/4)
+      			.outerRadius(width/4 + 30);
+
+
+      		//Creates function that will turn the month data into start and end angles
+      		var pie = d3.layout.pie()
+      			.value(function(d) { return 1/currentQuestion.length; })
+      			.padAngle(.01)
+      			.sort(null);
+
+          //Draw the arcs themselves
+      		svg.selectAll(".monthArc")
+      			.data(pie(currentQuestion))
+      		   .enter().append("path")
+      			.attr("class", "monthArc")
+      			.attr("id", function(d,i) { return "monthArc_"+i; })
+      			.attr("d", arc)
+
+      		//Append the month names within the arcs
+      		svg.selectAll(".monthText")
+      			.data(currentQuestion)
+      		   .enter().append("text")
+      			.attr("class", "monthText")
+      			.attr("x", 5) //Move the text from the start angle of the arc
+      			.attr("dy", 18) //Move the text down
+      		   .append("textPath")
+      			.attr("xlink:href",function(d,i){return "#monthArc_"+i;})
+      			.text(function(d,i){return d;});
+
+          //Scale
+          /*var	outerRadius = Math.min(width, height, 500)/2,
+	         innerRadius = outerRadius * 0.4;
+
+          var barWrapper = svg.append("g")
+            .attr("transform", "translate(" + 0 + "," + 0 + ")");
+
+          var barScale = d3.scale.linear()
+         	  .range([innerRadius, outerRadius])
+           	.domain([-15,30]);
+
+
+
+          var axes = barWrapper.selectAll(".gridCircles")
+            .data([-20,-10,0,10,20,30])
+          	.enter().append("g");
+
+          axes.append("circle")
+           	.attr("class", "axisCircles")
+           	.attr("r", function(d) { return barScale(d); });
+
+          axes.append("text")
+          	.attr("class", "axisText")
+          	.attr("y", function(d) { return barScale(d); })
+          	.attr("dy", "0.3em")
+          	.text(function(d) { return d; });
+
+          barWrapper.append("text")
+          	.attr("class", "question")
+          	.attr("x", -outerRadius * 1.3 * Math.cos(2 * Math.PI * 0/3))
+          	.attr("y", -outerRadius * 1.3 * Math.sin(2 * Math.PI * 0/3))
+          	.attr("dy", "0.9em")
+          	.text("Example 1");
+
+          barWrapper.append("text")
+          	.attr("class", "question")
+          	.attr("x", -outerRadius * 1.3 * Math.cos(2 * Math.PI * 1/3))
+          	.attr("y", -outerRadius * 1.3 * Math.sin(2 * Math.PI * 1/3))
+          	.attr("dy", "0.9em")
+          	.text("Example 2");
+
+          barWrapper.append("text")
+          	.attr("class", "question")
+          	.attr("x", -outerRadius * 1.3 * Math.cos(2 * Math.PI * 2/3))
+          	.attr("y", -outerRadius * 1.3 * Math.sin(2 * Math.PI * 2/3))
+          	.attr("dy", "0.9em")
+          	.text("Example 3");
+          //Add a line
+          barWrapper.append("line")
+          	.attr("class", "line")
+          	.attr("x1", -innerRadius * 0.4 * Math.cos(2 * Math.PI*0/3))
+          	.attr("y1", -innerRadius * 0.4 * Math.sin(2 * Math.PI*0/3))
+          	.attr("x2", -outerRadius * 1.2 * Math.cos(2 * Math.PI*0/3))
+          	.attr("y2", -outerRadius * 1.2 * Math.sin(2 * Math.PI*0/3));
+          barWrapper.append("line")
+          	.attr("class", "line")
+          	.attr("x1", -innerRadius * 0.4 * Math.cos(2 * Math.PI*1/3))
+          	.attr("y1", -innerRadius * 0.4 * Math.sin(2 * Math.PI*1/3))
+          	.attr("x2", -outerRadius * 1.2 * Math.cos(2 * Math.PI*1/3))
+          	.attr("y2", -outerRadius * 1.2 * Math.sin(2 * Math.PI*1/3));
+          barWrapper.append("line")
+          	.attr("class", "line")
+          	.attr("x1", -innerRadius * 0.4 * Math.cos(2 * Math.PI*2/3))
+          	.attr("y1", -innerRadius * 0.4 * Math.sin(2 * Math.PI*2/3))
+          	.attr("x2", -outerRadius * 1.2 * Math.cos(2 * Math.PI*2/3))
+          	.attr("y2", -outerRadius * 1.2 * Math.sin(2 * Math.PI*2/3));
+
+          barWrapper.selectAll(".dot")
+            .data([{x: 0, y: 0}, {x: 50, y: 50}])
+            .enter().append("circle")
+              .attr("class", "dot")
+              .attr("r", 3.5)
+              .attr("transform", function (d) {return "translate("+d.x+", "+d.y+")"})*/
+
+          function add(a, b) {
+            return a + b;
+          }
+        });
+
+      }
+
+
+    </script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+  </head>
+  <body>
+    <div id="graph"></div>
+  </body>
+</html>

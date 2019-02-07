@@ -55,6 +55,14 @@ app.get('/attention/:nth', function (req, res) {
   res.render('heatmap.ejs', {'nth': req.params.nth});
 });
 
+app.get('/mainview/:nth', function (req, res) {
+  res.render('circle.ejs', {'nth': req.params.nth});
+});
+
+app.get('/mainview2/:nth', function (req, res) {
+  res.render('circle2.ejs', {'nth': req.params.nth});
+});
+
 app.listen(3001, function () {
   console.log('Example app listening on port 3001!');
 });

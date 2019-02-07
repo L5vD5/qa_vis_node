@@ -52,10 +52,11 @@
 	  top: 100%;
 	  left: 0;
 	}
-	
+
 	.target_word {
 	  color: orange
 	}
+
     </style>
     <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
     <script
@@ -66,12 +67,12 @@
     // set the dimensions and margins of the graph
       window.onload = function() {
         width = 1700
-        height = 1300
+        height = 2000
         top_margin = 100
         left_margin = 130
         box_w = ((width - left_margin) / 25) + 1
         box_h = ((height - top_margin) / 8) + 1
-          
+
         var nth = <%=nth%>
 
         d3.json("../attention.json", function (data) {
@@ -82,72 +83,84 @@
           var sum = contextLenSum.reduce(add, 0);
           var currentContext = context.slice(sum, sum+len);
 
-/*          var x = d3.scale.ordinal()
-            .domain(d3.range(0, 19, 1))
-            .rangeBands([0, (box_w + 1) * 24])
+          c2q_attn = data.c2q_attn[nth-1];//Current c2q_attn
+          currentQuestion = data.questionSet[nth-1];//Current question
 
+          var max = 0;
+          var min = 1;
 
-          var y = d3.scale.ordinal()
-            .domain(currentContext)
-            .rangeBands([0, (box_h + 1) * 7])*/
-
-          data = data.c2q_attn[nth];
+          $.each(c2q_attn, function(idx, val) {
+            $.each(val, function(idx2, val2) {
+              if (max < val2)
+                max = val2;
+              if (min > val2)
+                min = val2;
+            }
+          )});
 
           var x = d3.scale.linear()
             .range([0, width])
-            .domain([0,data[0].length]);
+            .domain([0,c2q_attn[0].length]);
 
           var y = d3.scale.linear()
             .range([0, height])
-            .domain([0, data.length]);
+            .domain([0, c2q_attn.length])
 
           var xAxis = d3.svg.axis()
             .scale(x)
             .orient("top")
+            .ticks(currentQuestion.length)
+            .tickFormat(function(d) {return currentQuestion[d]})
+            .tickPadding(10)
 
           var yAxis = d3.svg.axis()
             .scale(y)
             .orient("left")
+            .ticks(currentContext.length)
+            .tickFormat(function(d) {return currentContext[d]})
+            .tickPadding(10, 10)
+
+          d3.selectAll("text")
+            .attr('y', 5)
 
           var chart = d3.select('#graph')
             .append('svg')
             .attr('class', 'chart')
-            .attr('width', width)
-            .attr('height', height)
+            .attr('width', width+150)
+            .attr('height', height+50)
 
-          var colorLow = 'green', colorMed = 'yellow', colorHigh = 'red';
+          var colorLow = 'white', colorMed = 'pink', colorHigh = 'red';
 
           var colorScale = d3.scale.linear()
-           .domain([0, 0.2])
+           .domain([min, max])
            .range([colorLow, colorMed, colorHigh]);
 
           var row = chart.selectAll(".row")
-            .data(data)
+            .data(c2q_attn)
               .enter().append("svg:g")
-              .attr("class", "row");            
+              .attr("class", "row");
 
           var col = row.selectAll(".cell")
             .data(function (d,i) {return d.map(function(a){return {value: a, row: i};})})
             .enter().append("svg:rect")
               .attr("class", "cell")
-              .attr("x", function(d, i) { return 130+x(i); })
-              .attr("y", function(d, i) { return 100+y(d.row); })
+              .attr("x", function(d, i) { return 100+x(i); })
+              .attr("y", function(d, i) { return 50+y(d.row); })
               .attr("width", x(1))
               .attr("height", y(1))
               .style("fill", function(d) { return  colorScale(d.value) });
 
           chart.append("g")
             .attr("class", "y axis")
-            .attr("transform", "translate(130, 100)")
+            .attr("transform", "translate(100, 50)")
             .attr("fill", "#666666")
             .call(yAxis)
 
           chart.append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(130, 100)")
+            .attr("transform", "translate(100, 50)")
             .attr("fill", "#666666")
             .call(xAxis)
-
 
           function add(a, b) {
             return a + b;
