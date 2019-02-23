@@ -6,7 +6,7 @@ d3.js visualization
 ### context_q
 ![](/img/context_q.jpg)
 ### char_c
-![](/img/char_c.jpg)
+![](https://github.com/L5vD5/qa_vis_node/blob/master/img/char_c.JPG)
 ### char_q
 ![](/img/char_q.jpg)
 ![](/img/word_c.jpg)
