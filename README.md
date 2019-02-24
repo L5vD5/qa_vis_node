@@ -8,22 +8,22 @@ d3.js visualization
 ### char_c
 ![](https://github.com/L5vD5/qa_vis_node/blob/master/img/char_c.JPG)
 ### char_q
-![](https://github.com/L5vD5/qa_vis_node/blob/master/img/char_q.jpg)
+![](https://github.com/L5vD5/qa_vis_node/blob/master/img/char_q.JPG)
 ### word_c
-![](https://github.com/L5vD5/qa_vis_node/blob/master/img/word_c.jpg)
+![](https://github.com/L5vD5/qa_vis_node/blob/master/img/word_c.JPG)
 ### word_q
-![](https://github.com/L5vD5/qa_vis_node/blob/master/img/word_q.jpg)
+![](https://github.com/L5vD5/qa_vis_node/blob/master/img/word_q.JPG)
 ### highway_c
-![](https://github.com/L5vD5/qa_vis_node/blob/master/img/highway_c.jpg)
+![](https://github.com/L5vD5/qa_vis_node/blob/master/img/highway_c.JPG)
 ### highway_q
-![](https://github.com/L5vD5/qa_vis_node/blob/master/img/highway_q.jpg)
+![](https://github.com/L5vD5/qa_vis_node/blob/master/img/highway_q.JPG)
 ### loss
-![](https://github.com/L5vD5/qa_vis_node/blob/master/img/loss.jpg)
+![](https://github.com/L5vD5/qa_vis_node/blob/master/img/loss.JPG)
 ### pos
-![](https://github.com/L5vD5/qa_vis_node/blob/master/img/pos.jpg)
+![](https://github.com/L5vD5/qa_vis_node/blob/master/img/pos.JPG)
 ### attention
-![](https://github.com/L5vD5/qa_vis_node/blob/master/img/attention.jpg)
+![](https://github.com/L5vD5/qa_vis_node/blob/master/img/attention.JPG)
 ### mainview
-![](https://github.com/L5vD5/qa_vis_node/blob/master/img/mainview.jpg)
+![](https://github.com/L5vD5/qa_vis_node/blob/master/img/mainview.JPG)
 ### mainview2
-![](https://github.com/L5vD5/qa_vis_node/blob/master/img/mainview2.jpg)
+![](https://github.com/L5vD5/qa_vis_node/blob/master/img/mainview2.JPG)
